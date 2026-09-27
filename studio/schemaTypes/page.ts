@@ -74,7 +74,7 @@ export default defineType({
           name: 'alt',
           title: 'Describe this image',
           type: 'string',
-          description: 'Read aloud by screen readers and used by search engines. Example: "Manuel painting a mural on a brick wall".',
+          description: 'Read aloud by screen readers and used by search engines. Example: "Me painting a mural on a brick wall".',
           validation: (Rule) => Rule.required(),
         },
       ],

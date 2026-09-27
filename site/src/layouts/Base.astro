@@ -16,7 +16,7 @@ interface Props {
 
 const { title, description, image, section, schema } = Astro.props
 
-const settings = { siteName: 'Murillo Murals', ...(await getSettings()) }
+const settings = { siteName: 'YOUR SITE NAME', ...(await getSettings()) }
 const pages = await getPages()
 
 const pageTitle = title ? `${title} — ${settings.siteName}` : settings.siteName

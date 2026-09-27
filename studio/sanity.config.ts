@@ -7,7 +7,7 @@ import { sides } from './schemaTypes/work'
 
 export default defineConfig({
   name: 'default',
-  title: 'Murillo',
+  title: 'UAC-Template',
   projectId: process.env.SANITY_STUDIO_PROJECT_ID || '',
   dataset: 'production',
 
@@ -15,7 +15,7 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
-          .title('Murillo')
+          .title('UAC-Template')
           .items([
             S.listItem()
               .title('Site Settings')

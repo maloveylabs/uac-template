@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap'
 
 export default defineConfig({
   // Change this to the real domain once it is connected.
-  site: 'https://murillomurals.com',
+  site: 'https://yoursite.com',
   output: 'static',
   adapter: vercel(),
   integrations: [sitemap()],

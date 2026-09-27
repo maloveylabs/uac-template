@@ -1,6 +1,8 @@
-# Murillo Murals
+# UAC-Template
 
-The website of Manuel Murillo — muralist and painter in Ottawa.
+A template website for artists taking the Urban Art Collective course hosted by Malovey. 
+
+This site is for your independent use and as a guide to follow along during the course. 
 
 Built with [Astro](https://astro.build) (the website), [Sanity](https://sanity.io)
 (where the work is added) and [Vercel](https://vercel.com) (what puts it online).
@@ -60,6 +62,28 @@ only invited people can open it.
 
 ---
 
+## Make it yours
+
+The template ships with placeholder names. Swap them for your own before you
+put it online:
+
+| File | Change | To |
+| --- | --- | --- |
+| `site/astro.config.mjs` | `https://yoursite.com` | your real address |
+| `site/public/robots.txt` | `https://yoursite.com` | your real address |
+| `site/src/layouts/Base.astro` | `YOUR SITE NAME` | your site name |
+| `studio/sanity.config.ts` | `UAC-Template` (twice) | your site name |
+| `site/package.json`, `studio/package.json` | `uac-template` | anything, e.g. `jane-doe-site` |
+
+Then open the editor, go to **Site Settings** and fill in your site name, your
+name and the description. Those are what visitors and Google actually see; the
+name in `Base.astro` only shows if Site Settings is empty.
+
+Search the project for `yoursite`, `YOUR SITE` and `uac-template` to check
+you got them all.
+
+---
+
 ## What's on the site
 
 | Page | What it is |
@@ -68,7 +92,7 @@ only invited people can open it.
 | `/studio` | Studio — the same, for canvas and studio work |
 | `/gallery` | Everything, as thumbnails grouped by year |
 | `/work/…` | A single piece: details on the left, photos on the right |
-| `/about` | Manuel's story, with press at the bottom |
+| `/about` | Your story, with press at the bottom |
 | `/contact` | Message form, email and Instagram |
 
 ---
@@ -158,7 +182,8 @@ Without the token the rest of the site works fine — only the form is inactive.
 ## Your own domain
 
 In Vercel, go to **Settings → Domains** and add it. Then open
-`site/astro.config.mjs` and change the `site` line to match.
+`site/astro.config.mjs` and `site/public/robots.txt` and change the address to
+match.
 
 ---
 

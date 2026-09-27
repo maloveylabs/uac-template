@@ -1,0 +1,43 @@
+---
+import Arrow from './Arrow.astro'
+import type { SiteSettings } from '@/lib/types'
+
+interface Props {
+  settings: SiteSettings
+}
+
+// Wording in the footer. Change the text between the quotes.
+const COPY = {
+  cta: 'Have a wall in mind?',
+  email: 'Email',
+  credit: 'Website by Malovey',
+}
+
+const { settings } = Astro.props
+const campaign = new URL(Astro.url.origin).hostname
+const maloveyUrl = `https://malovey.com/?utm_source=${campaign}&utm_medium=referral&utm_campaign=${campaign}`
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <a class="footer-cta" href="/contact">{COPY.cta} <Arrow /></a>
+
+    <div class="footer-row">
+      <span>© {new Date().getFullYear()} {settings.siteName}</span>
+      <div class="social-links">
+        {settings.email && <a href={`mailto:${settings.email}`}>{COPY.email}</a>}
+        {
+          settings.socials?.map((social) => (
+            <a href={social.url} target="_blank" rel="noopener">
+              {social.label}
+            </a>
+          ))
+        }
+      </div>
+      <a class="byline" href={maloveyUrl} target="_blank" rel="noopener">
+        <img src="/malovey.svg" alt="" width="15" height="15" />
+        <span>{COPY.credit}</span>
+      </a>
+    </div>
+  </div>
+</footer>

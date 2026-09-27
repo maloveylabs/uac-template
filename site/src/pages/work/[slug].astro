@@ -1,0 +1,94 @@
+---
+import Base from '@/layouts/Base.astro'
+import Facts from '@/components/Facts.astro'
+import Image from '@/components/Image.astro'
+import PortableText from '@/components/PortableText.astro'
+import { getSettings, getWorks } from '@/lib/queries'
+import { artworkSchema } from '@/lib/seo'
+import { SIDE_LABELS, type Work } from '@/lib/types'
+
+// Wording on this page. The labels down the side are the left half of each pair.
+const COPY = {
+  back: (side: string) => `‹ ${side}`,
+  next: 'Next project',
+  facts: {
+    type: 'Type',
+    year: 'Year',
+    medium: 'Medium',
+    size: 'Size',
+    client: 'Commissioned by',
+    place: 'Location',
+    status: 'Availability',
+  },
+}
+
+export async function getStaticPaths() {
+  const works = await getWorks()
+  return works.map((work: Work) => {
+    const sameSide = works.filter((item: Work) => item.side === work.side)
+    const position = sameSide.indexOf(work)
+    return {
+      params: { slug: work.slug.current },
+      props: { work, next: sameSide[(position + 1) % sameSide.length] },
+    }
+  })
+}
+
+const { work, next } = Astro.props as { work: Work; next: Work }
+const settings = await getSettings()
+const studio = work.side === 'studio'
+const facts = [
+  { label: COPY.facts.type, value: SIDE_LABELS[work.side] },
+  { label: COPY.facts.year, value: work.year },
+  { label: COPY.facts.medium, value: work.medium },
+  { label: COPY.facts.size, value: work.dimensions },
+  { label: COPY.facts.client, value: work.client },
+  { label: COPY.facts.place, value: work.place },
+  { label: COPY.facts.status, value: work.status },
+]
+---
+
+<Base
+  title={work.title}
+  description={work.seoDescription}
+  image={work.images?.[0]}
+  section={studio ? 'studio' : 'murals'}
+  schema={settings ? artworkSchema(work, settings, Astro.url.href) : undefined}
+>
+  <article class="entry">
+    <div class="entry-rail">
+      <a class="back" href={studio ? '/studio' : '/'}>
+        {COPY.back(studio ? 'studio' : 'murals')}
+      </a>
+      <h1 class="entry-title">{work.title}</h1>
+      {work.medium && <p class="entry-sub">{work.medium}</p>}
+      <Facts items={facts} />
+    </div>
+
+    <div class="entry-flow">
+      <PortableText value={work.description} class="prose prose--lead entry-note" />
+      {
+        work.images?.map((image, index) => (
+          <figure>
+            <Image
+              image={image}
+              alt={work.title}
+              width={2000}
+              sizes="(max-width: 900px) 100vw, 55vw"
+              eager={index === 0}
+            />
+            {image.caption && <figcaption class="label muted">{image.caption}</figcaption>}
+          </figure>
+        ))
+      }
+      {
+        next && next.slug.current !== work.slug.current && (
+          <a class="entry-next" href={`/work/${next.slug.current}`}>
+            <span class="label muted">{COPY.next}</span>
+            <span class="entry-next-title">{next.title} →</span>
+          </a>
+        )
+      }
+    </div>
+  </article>
+</Base>

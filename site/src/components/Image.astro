@@ -1,0 +1,31 @@
+---
+import { urlFor, sizeOf } from '@/lib/sanity'
+import type { SanityImage } from '@/lib/types'
+
+interface Props {
+  image: SanityImage
+  alt: string
+  width?: number
+  sizes?: string
+  class?: string
+  eager?: boolean
+}
+
+const { image, alt, width = 1000, sizes = '100vw', class: className, eager } = Astro.props
+const size = sizeOf(image)
+const steps = [400, 600, 900, 1200, 1600, 2000].filter((step) => step < width)
+const srcset = [...steps, width].map((step) => `${urlFor(image).width(step).url()} ${step}w`).join(', ')
+---
+
+<img
+  class={className}
+  src={urlFor(image).width(width).url()}
+  srcset={srcset}
+  sizes={sizes}
+  alt={image.alt ?? alt}
+  width={size?.width}
+  height={size?.height}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding={eager ? 'sync' : 'async'}
+  fetchpriority={eager ? 'high' : undefined}
+/>

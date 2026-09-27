@@ -1,0 +1,52 @@
+---
+import Base from '@/layouts/Base.astro'
+import Facts from '@/components/Facts.astro'
+import Image from '@/components/Image.astro'
+import PortableText from '@/components/PortableText.astro'
+import PressList from '@/components/PressList.astro'
+import { getPages, getPress, getSettings } from '@/lib/queries'
+
+// Fallbacks only. The real wording lives in Sanity under Pages → About.
+const COPY = {
+  label: 'About',
+  press: 'Press',
+  read: 'Read →',
+}
+
+const [settings, pages, press] = await Promise.all([getSettings(), getPages(), getPress()])
+const page = pages.find((item) => item.slug.current === 'about')
+const label = page?.title ?? COPY.label
+---
+
+<Base title={label} description={page?.seoDescription} image={page?.image}>
+  <article class="entry">
+    <div class="entry-rail">
+      <p class="label muted">{label}</p>
+      <h1 class="entry-title">{page?.heading ?? settings?.artistName}</h1>
+      {
+        (page?.intro ?? settings?.tagline) && (
+          <p class="entry-sub">{page?.intro ?? settings?.tagline}</p>
+        )
+      }
+      <Facts items={page?.details ?? []} />
+      {settings?.email && <a class="more" href={`mailto:${settings.email}`}>{settings.email}</a>}
+    </div>
+
+    <div class="entry-flow">
+      {
+        page?.image && (
+          <Image
+            class="entry-portrait"
+            image={page.image}
+            alt={page.heading ?? label}
+            width={1000}
+            sizes="(max-width: 900px) 55vw, 18rem"
+            eager
+          />
+        )
+      }
+      <PortableText value={page?.body} class="prose prose--lead entry-note" />
+      <PressList items={press} title={COPY.press} link={COPY.read} />
+    </div>
+  </article>
+</Base>

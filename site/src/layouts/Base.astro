@@ -1,0 +1,76 @@
+---
+import '@/styles/theme.css'
+import Header from '@/components/Header.astro'
+import Footer from '@/components/Footer.astro'
+import { getSettings, getPages } from '@/lib/queries'
+import { personSchema, shareImage } from '@/lib/seo'
+import type { SanityImage } from '@/lib/types'
+
+interface Props {
+  title?: string
+  description?: string
+  image?: SanityImage
+  section?: 'murals' | 'studio'
+  schema?: Record<string, unknown>
+}
+
+const { title, description, image, section, schema } = Astro.props
+
+const settings = { siteName: 'Murillo Murals', ...(await getSettings()) }
+const pages = await getPages()
+
+const pageTitle = title ? `${title} — ${settings.siteName}` : settings.siteName
+const pageDescription = description ?? settings.seoDescription ?? settings.intro ?? ''
+const shared = image ?? settings.socialImage
+const social = shareImage(shared)
+const schemas = [personSchema(settings, Astro.site?.href ?? Astro.url.origin), schema].filter(Boolean)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+    />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={Astro.url.href} />
+
+    <meta property="og:site_name" content={settings.siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content={title ? 'article' : 'website'} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:locale" content="en_CA" />
+    {social && <meta property="og:image" content={social} />}
+    {social && <meta property="og:image:width" content="1200" />}
+    {social && <meta property="og:image:height" content="630" />}
+    {social && shared?.alt && <meta property="og:image:alt" content={shared.alt} />}
+
+    <meta name="twitter:card" content={social ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    {social && <meta name="twitter:image" content={social} />}
+
+    {
+      schemas.map((item) => (
+        <script type="application/ld+json" set:html={JSON.stringify(item, (_, value) => value ?? undefined)} />
+      ))
+    }
+  </head>
+
+  <body>
+    <Header settings={settings} pages={pages} section={section} />
+    <main class="wrap">
+      <slot />
+    </main>
+    <Footer settings={settings} />
+  </body>
+</html>

@@ -1,0 +1,88 @@
+---
+import Base from '@/layouts/Base.astro'
+import Facts from '@/components/Facts.astro'
+import PortableText from '@/components/PortableText.astro'
+import { getPages, getSettings } from '@/lib/queries'
+
+// Wording on this page. The heading and intro can also be set in Sanity under
+// Pages → Say hello, which wins over the fallbacks here.
+const COPY = {
+  label: 'Contact',
+  heading: "Let's make something",
+  name: 'Name',
+  email: 'Email',
+  message: 'Message',
+  send: 'Send message',
+  sending: 'Sending…',
+  sent: 'Thank you. Your message is on its way.',
+  failed: 'Something went wrong. Please email instead.',
+}
+
+const [settings, pages] = await Promise.all([getSettings(), getPages()])
+const page = pages.find((item) => item.slug.current === 'contact')
+const intro = page?.intro ?? settings?.availableFor
+---
+
+<Base title={page?.title ?? COPY.label} description={page?.seoDescription}>
+  <article class="entry">
+    <div class="entry-rail">
+      <p class="label muted">{page?.title ?? COPY.label}</p>
+      <h1 class="entry-title">{page?.heading ?? COPY.heading}</h1>
+      {intro && <p class="entry-sub">{intro}</p>}
+      <div class="contact-direct">
+        {settings?.email && <a class="more" href={`mailto:${settings.email}`}>{settings.email}</a>}
+        {
+          settings?.socials?.map((social) => (
+            <a class="more" href={social.url} target="_blank" rel="noopener">
+              {social.label} →
+            </a>
+          ))
+        }
+      </div>
+      <Facts items={page?.details ?? []} />
+    </div>
+
+    <div class="entry-flow">
+      <PortableText value={page?.body} class="prose entry-note" />
+      <form id="contact-form">
+        <div class="field">
+          <label class="label muted" for="name">{COPY.name}</label>
+          <input id="name" name="name" type="text" required />
+        </div>
+        <div class="field">
+          <label class="label muted" for="email">{COPY.email}</label>
+          <input id="email" name="email" type="email" required />
+        </div>
+        <div class="field">
+          <label class="label muted" for="message">{COPY.message}</label>
+          <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        <button class="button" type="submit">{COPY.send}</button>
+        <p class="form-note" id="form-note" role="status"></p>
+      </form>
+    </div>
+  </article>
+</Base>
+
+<script is:inline define:vars={{ COPY }}>
+  const form = document.querySelector('#contact-form')
+  const note = document.querySelector('#form-note')
+  const button = form.querySelector('button')
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    button.disabled = true
+    note.textContent = COPY.sending
+
+    try {
+      const response = await fetch('/api/inquiry', { method: 'POST', body: new FormData(form) })
+      if (!response.ok) throw new Error()
+      form.reset()
+      note.textContent = COPY.sent
+    } catch {
+      note.textContent = COPY.failed
+    }
+
+    button.disabled = false
+  })
+</script>

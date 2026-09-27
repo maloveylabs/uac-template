@@ -1,0 +1,576 @@
+/* ==========================================================================
+   THE LOOK OF THE SITE LIVES IN THIS FILE.
+
+   The settings below are the ones worth changing. Edit a value, save, and the
+   whole site follows. Everything further down is the wiring — you can leave it.
+   ========================================================================== */
+
+:root {
+  /* FONTS
+     Both come from fonts.google.com, which is free. To swap one, pick a font
+     there and change the name here, then update the matching <link> in
+     src/layouts/Base.astro so the new font is actually downloaded. */
+
+  /* Paragraphs, menus and the small uppercase labels. */
+  --font-body: 'Manrope', system-ui, sans-serif;
+
+  /* Headings, project titles and the site name. */
+  --font-serif: 'Instrument Serif', Georgia, serif;
+
+  /* COLOURS
+     Paste any hex code from a colour picker. Keep the background light and the
+     text dark, or the site becomes hard to read. */
+
+  /* Page background — the warm taupe. */
+  --color-bg: #ded6ca;
+
+  /* Main text, near-black rather than pure black. */
+  --color-ink: #16130f;
+
+  /* The one splash of colour: the dot after the site name, the current menu
+     item, and links when you hover them. Used sparingly on purpose. */
+  --color-accent: #e0492a;
+
+  /* Quieter text: dates, labels, captions. Mixed from the two colours above,
+     so it stays in key when you change them. */
+  --color-muted: color-mix(in srgb, var(--color-ink) 48%, var(--color-bg));
+
+  /* Hairlines under links and form fields. */
+  --color-line: color-mix(in srgb, var(--color-ink) 14%, var(--color-bg));
+
+  /* SPACING AND WIDTH */
+
+  /* Space between things, and the bigger gap between sections. */
+  --gap: 1.5rem;
+  --gap-lg: clamp(3.5rem, 7vw, 6rem);
+
+  /* Breathing room at the left and right edges of the screen. */
+  --pad: clamp(1.25rem, 4vw, 3.5rem);
+
+  /* Widest the page ever gets on a large screen. */
+  --measure: 1440px;
+
+  /* Gap between photos in the gallery grid. */
+  --strip-gap: 8px;
+}
+
+/* --- Everything below here is wiring ------------------------------------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+h1, h2, h3, p, figure, blockquote, dl, dd, ol, ul { margin: 0; }
+
+button, input, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font: 400 1rem/1.6 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; height: auto; }
+::selection { background: var(--color-accent); color: var(--color-bg); }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+.wrap {
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+.muted { color: var(--color-muted); }
+
+.label {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+}
+.more:hover { color: var(--color-accent); border-color: var(--color-accent); }
+
+.button {
+  padding: 0.95rem 1.6rem;
+  border: 0;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font: 600 0.72rem var(--font-body);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.button:hover { background: var(--color-accent); }
+.button[disabled] { opacity: 0.55; cursor: wait; }
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.wordmark .dot { color: var(--color-accent); }
+
+/* --- Header: the site name, the little sketch, and the menu --- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding-block: 1.25rem;
+  background: var(--color-bg);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.logo-mark {
+  width: auto;
+  height: clamp(2.2rem, 4.2vw, 3.2rem);
+  mix-blend-mode: multiply;
+}
+.logo .wordmark {
+  font-size: clamp(1.9rem, 4.2vw, 3.3rem);
+  line-height: 1;
+}
+
+.site-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  font-weight: 500;
+}
+.site-nav a { color: var(--color-muted); transition: color 0.2s; }
+.site-nav a:hover { color: var(--color-accent); }
+.site-nav a[aria-current='page'] { color: var(--color-accent); }
+
+/* --- About, Say hello, a single project and any page you add --- */
+
+.entry {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding-bottom: var(--gap-lg);
+}
+.entry-rail {
+  position: sticky;
+  top: 8rem;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-right: var(--pad);
+}
+.back {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.back:hover { color: var(--color-accent); }
+.entry-title {
+  margin: 0;
+  font: 400 clamp(2.2rem, 4vw, 3.4rem)/1.02 var(--font-serif);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0.5rem 0 0;
+}
+.facts dt { margin-bottom: 0.25rem; }
+.facts dd { margin: 0; font-size: 0.95rem; }
+
+.entry-sub {
+  max-width: 26rem;
+  margin: 0;
+  color: var(--color-muted);
+  font: italic 400 clamp(1.15rem, 1.6vw, 1.4rem)/1.35 var(--font-serif);
+}
+
+.entry-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--strip-gap);
+}
+.entry-flow .entry-portrait {
+  width: min(100%, 18rem);
+  margin-inline: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.entry-portrait + .entry-note { margin-top: var(--gap); }
+.entry-flow figure { margin: 0; }
+.entry-flow img { width: 100%; }
+.entry-flow figcaption { padding: 0.6rem 0 1rem; }
+
+.entry-note,
+.flow-note {
+  max-width: 44rem;
+  margin-block: var(--gap-lg) var(--gap);
+}
+.flow-note .label { margin-bottom: 1rem; }
+.press-block { margin-top: 2rem; }
+.prose > :last-child { margin-bottom: 0; }
+.flow-note .more { margin-top: 1.5rem; }
+
+.entry-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap);
+  margin-top: var(--gap-lg);
+}
+.entry-next-title {
+  font: 400 clamp(1.5rem, 2.6vw, 2.2rem)/1.1 var(--font-serif);
+  transition: color 0.2s;
+}
+.entry-next:hover .entry-next-title { color: var(--color-accent); }
+
+.press-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.press-item {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.5rem var(--gap);
+  padding-block: 1.25rem;
+}
+.press-body { display: flex; flex-direction: column; gap: 0.5rem; }
+.press-title {
+  font: 400 1.4rem/1.25 var(--font-serif);
+  transition: color 0.2s;
+}
+.press-excerpt {
+  max-width: 44rem;
+  color: var(--color-muted);
+  font: italic 400 1.15rem/1.4 var(--font-serif);
+}
+.press-item:hover :is(.press-title, .more) { color: var(--color-accent); }
+.press-block .press-item {
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+/* --- Words written in Sanity: paragraphs, headings, quotes, lists --- */
+
+.prose { max-width: 42rem; }
+.prose p,
+.prose ul,
+.prose ol {
+  margin-block: 1.1em;
+  padding-left: 1.2em;
+}
+.prose h2 {
+  margin: 2.4em 0 0.6em;
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.prose h3 {
+  margin: 1.8em 0 0.3em;
+  font: 400 1.3rem var(--font-serif);
+}
+.prose a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+.prose a:hover { color: var(--color-accent); }
+.prose blockquote {
+  max-width: 34rem;
+  margin: 2em 0;
+  font: italic 400 1.4rem/1.35 var(--font-serif);
+}
+.prose--lead > p:first-child {
+  margin-top: 0;
+  font: 400 clamp(1.3rem, 2vw, 1.7rem)/1.4 var(--font-serif);
+}
+
+.contact-direct {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+/* --- Contact form --- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+.field input,
+.field textarea {
+  padding: 0.7rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-ink);
+  background: none;
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+.field input:focus,
+.field textarea:focus { outline: none; border-color: var(--color-accent); }
+.form-note {
+  min-height: 1.2em;
+  margin: 1rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+/* --- Murals and Studio pages: the list on the left, photos on the right --- */
+
+.reel {
+  display: grid;
+  grid-template-columns: minmax(11rem, 17vw) minmax(0, 1fr);
+  gap: var(--gap);
+  padding-block: 0.5rem var(--gap-lg);
+}
+.reel-list {
+  position: sticky;
+  top: calc(var(--header-h, 5.5rem) + 1.5rem);
+  align-self: start;
+}
+.reel-list ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reel-list a {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  transition: color 0.25s;
+}
+.reel-list a:hover { color: var(--color-ink); }
+.reel-list li[data-active] a {
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 1.8vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.reel-frame {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+}
+.shot {
+  margin: 0;
+  scroll-margin-top: calc(var(--header-h, 5.5rem) + 1rem);
+  scroll-snap-align: center;
+}
+.shot a {
+  position: relative;
+  display: block;
+}
+.shot img {
+  width: 100%;
+  height: min(76svh, 46rem);
+  object-fit: cover;
+}
+.shot figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  padding-top: 0.8rem;
+}
+.shot-title {
+  font: 400 clamp(1.2rem, 1.8vw, 1.6rem)/1.2 var(--font-serif);
+  transition: color 0.2s;
+}
+.shot:hover .shot-title { color: var(--color-accent); }
+.shot-label {
+  position: absolute;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.shot-label--tl { top: 1.5rem; left: 1.5rem; }
+.shot-label--tr { top: 1.5rem; right: 1.5rem; text-align: right; }
+.shot-label--br { right: 1.5rem; bottom: 1.5rem; text-align: right; }
+
+.reel-more {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  gap: 0.5rem;
+  width: fit-content;
+  margin-top: 1.5rem;
+  padding-bottom: 3px;
+  border-bottom: 1px solid var(--color-line);
+  font: 400 clamp(1.3rem, 2vw, 1.8rem)/1.2 var(--font-serif);
+  transition: color 0.2s, border-color 0.2s;
+}
+.reel-more:hover { color: var(--color-accent); border-color: var(--color-accent); }
+
+/* --- Gallery page: thumbnails grouped by year --- */
+
+.gallery-year + .gallery-year { margin-top: var(--gap-lg); }
+.gallery-year > .label { margin-bottom: 1rem; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.gallery-grid a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.gallery-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  margin-bottom: 0.3rem;
+}
+.gallery-title {
+  font: 400 1.15rem/1.2 var(--font-serif);
+  transition: color 0.2s;
+}
+.gallery-grid a:hover .gallery-title { color: var(--color-accent); }
+
+.entry--wide { grid-template-columns: minmax(0, 3fr) minmax(0, 9fr); }
+
+.reel-empty {
+  margin: 0;
+  color: var(--color-muted);
+  font: 400 clamp(1.3rem, 2vw, 1.8rem)/1.3 var(--font-serif);
+}
+
+/* --- Footer --- */
+
+.site-footer {
+  margin-top: var(--gap-lg);
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+.footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-block: clamp(3rem, 7vw, 5.5rem);
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  transition: color 0.3s;
+}
+.footer-cta svg { width: 0.5em; height: 0.5em; }
+.footer-cta:hover { color: var(--color-accent); }
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding-block: 1.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-bg) 20%, transparent);
+  font-size: 0.8rem;
+}
+.site-footer .footer-row a:hover { color: var(--color-accent); }
+.social-links { display: flex; gap: var(--gap); }
+.byline { display: flex; align-items: center; gap: 0.5rem; }
+.byline img { width: 15px; height: 15px; }
+
+/* --- Phones and small tablets --- */
+
+@media (max-width: 900px) {
+  .site-header {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  .logo { justify-content: center; }
+  .logo .wordmark { font-size: 1.5rem; }
+  .site-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 1.1rem;
+    font-size: 0.95rem;
+  }
+  .site-nav a { white-space: nowrap; }
+
+  .entry {
+    grid-template-columns: 1fr;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: var(--pad);
+  }
+  .entry-rail {
+    position: static;
+    padding-right: 0;
+    padding-bottom: 2rem;
+  }
+  .entry-flow { margin-inline: calc(var(--pad) * -1); }
+  .entry-flow :is(.entry-note, .flow-note, .entry-next, figcaption, form, .prose) { margin-inline: var(--pad); }
+  .press-item { grid-template-columns: 1fr; }
+  .entry-flow .entry-portrait { width: min(55%, 13rem); margin-inline: auto; }
+  .logo-mark { height: 2rem; }
+
+  .reel {
+    grid-template-columns: 1fr;
+    margin-inline: calc(50% - 50vw);
+    padding-inline: var(--pad);
+  }
+  .reel-list { display: none; }
+  html:has(.reel) { scroll-snap-type: y proximity; }
+  .reel-frame { margin-inline: calc(var(--pad) * -1); }
+  .shot figcaption { padding-inline: var(--pad); }
+  .shot img { height: min(68svh, 34rem); }
+}

@@ -1,0 +1,58 @@
+---
+import Wordmark from './Wordmark.astro'
+import type { SiteSettings, Page } from '@/lib/types'
+
+interface Props {
+  settings: SiteSettings
+  pages: Page[]
+  section?: 'murals' | 'studio'
+}
+
+// Menu wording. The About and Say hello labels follow their page titles in
+// Sanity; these are only used when those pages are missing.
+const COPY = {
+  murals: 'murals',
+  studio: 'studio',
+  gallery: 'gallery',
+  about: 'about',
+  contact: 'say hello',
+}
+
+const { settings, pages, section } = Astro.props
+const path = Astro.url.pathname
+const sections: Record<string, string> = { '/': 'murals', '/studio': 'studio' }
+const isCurrent = (href: string) =>
+  href in sections ? sections[href] === section : path.startsWith(href)
+
+const core = ['about', 'contact']
+const extras = pages.filter(
+  (page) => page.showInMenu !== false && !core.includes(page.slug.current),
+)
+const named = (slug: string, fallback: string) =>
+  pages.find((page) => page.slug.current === slug)?.title.toLowerCase() ?? fallback
+
+const links = [
+  { href: '/', label: COPY.murals },
+  { href: '/studio', label: COPY.studio },
+  { href: '/gallery', label: COPY.gallery },
+  { href: '/about', label: named('about', COPY.about) },
+  ...extras.map((page) => ({ href: `/${page.slug.current}`, label: page.title.toLowerCase() })),
+  { href: '/contact', label: named('contact', COPY.contact) },
+]
+---
+
+<header class="site-header wrap">
+  <a class="logo" href="/">
+    <img class="logo-mark" src="/sketch.png" alt="" width="795" height="795" />
+    <Wordmark name={settings.siteName} />
+  </a>
+  <nav class="site-nav">
+    {
+      links.map((link) => (
+        <a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>

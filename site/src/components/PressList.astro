@@ -1,0 +1,35 @@
+---
+import type { PressItem } from '@/lib/types'
+
+interface Props {
+  items: PressItem[]
+  title: string
+  link: string
+}
+
+const { items, title, link } = Astro.props
+---
+
+{
+  items.length > 0 && (
+    <section class="flow-note press-block">
+      <p class="label muted">{title}</p>
+      <ul class="press-list">
+        {items.map((item) => (
+          <li>
+            <a class="press-item" href={item.url} target="_blank" rel="noopener">
+              <span class="label muted">
+                {[item.publication, item.date?.slice(0, 4)].filter(Boolean).join(' · ')}
+              </span>
+              <span class="press-body">
+                <span class="press-title">{item.title}</span>
+                {item.excerpt && <span class="press-excerpt">“{item.excerpt}”</span>}
+              </span>
+              <span class="more">{link}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

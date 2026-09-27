@@ -1,0 +1,24 @@
+---
+import Base from '@/layouts/Base.astro'
+import Reel from '@/components/Reel.astro'
+import { getSettings, getWorks } from '@/lib/queries'
+import { forSide } from '@/lib/works'
+
+// Wording on this page. Change the text between the quotes.
+const COPY = {
+  empty: 'New murals are on the way.',
+  more: 'See all work',
+}
+
+const [settings, works] = await Promise.all([getSettings(), getWorks()])
+const { shown, hasMore } = forSide(works, 'mural')
+---
+
+<Base section="murals" image={shown[0]?.images?.[0]}>
+  <Reel
+    works={shown}
+    settings={settings}
+    empty={COPY.empty}
+    more={hasMore ? COPY.more : undefined}
+  />
+</Base>

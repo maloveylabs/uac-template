@@ -1,0 +1,100 @@
+---
+import Image from './Image.astro'
+import { SIDE_LABELS, type SiteSettings, type Work } from '@/lib/types'
+
+interface Props {
+  works: Work[]
+  settings: SiteSettings | null
+  empty: string
+  more?: string
+}
+
+// Wording on the photo pages. Change the text between the quotes.
+const COPY = {
+  listTitle: 'Work',
+  by: 'By',
+}
+
+const { works, settings, empty, more } = Astro.props
+---
+
+<div class="reel">
+  <nav class="reel-list" aria-label={COPY.listTitle}>
+    <ol>
+      {
+        works.map((work, index) => (
+          <li data-active={index === 0 ? '' : undefined}>
+            <a href={`#${work.slug.current}`}>{work.title}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <div class="reel-frame">
+    {
+      works.map((work, index) => (
+        <figure class="shot" id={work.slug.current}>
+          <a href={`/work/${work.slug.current}`}>
+            <Image
+              image={work.images![0]}
+              alt={work.title}
+              width={2000}
+              sizes="(max-width: 900px) 100vw, 70vw"
+              eager={index < 2}
+            />
+            <span class="shot-label shot-label--tl">
+              {SIDE_LABELS[work.side]}
+              {work.medium && <br />}
+              {work.medium}
+            </span>
+            {settings?.artistName && (
+              <span class="shot-label shot-label--tr">{COPY.by} {settings.artistName}</span>
+            )}
+            <span class="shot-label shot-label--br">
+              {work.place}
+              {work.place && work.year && <br />}
+              {work.year}
+            </span>
+          </a>
+          <figcaption>
+            <span class="shot-title">{work.title}</span>
+          </figcaption>
+        </figure>
+      ))
+    }
+    {works.length === 0 && <p class="reel-empty">{empty}</p>}
+    {more && <a class="reel-more" href="/gallery">{more} →</a>}
+  </div>
+</div>
+
+<script>
+  const shots = [...document.querySelectorAll<HTMLElement>('.shot')]
+  const items = [...document.querySelectorAll<HTMLElement>('.reel-list li')]
+  const header = document.querySelector<HTMLElement>('.site-header')
+
+  const setHeaderHeight = () =>
+    document.documentElement.style.setProperty('--header-h', `${header?.offsetHeight ?? 0}px`)
+  setHeaderHeight()
+  addEventListener('resize', setHeaderHeight)
+  document.fonts?.ready.then(setHeaderHeight)
+
+  const watcher = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        const position = shots.indexOf(entry.target as HTMLElement)
+        items.forEach((item, i) => item.toggleAttribute('data-active', i === position))
+      }),
+    { rootMargin: '-45% 0px -45% 0px' },
+  )
+  shots.forEach((shot) => watcher.observe(shot))
+
+  // Clicking a title glides to that photo; plain scrolling stays untouched.
+  items.forEach((item, i) =>
+    item.querySelector('a')?.addEventListener('click', (event) => {
+      event.preventDefault()
+      shots[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }),
+  )
+</script>

@@ -1,0 +1,62 @@
+---
+import Base from '@/layouts/Base.astro'
+import Image from '@/components/Image.astro'
+import { getSettings, getWorks } from '@/lib/queries'
+import { withImages } from '@/lib/works'
+import { SIDE_LABELS } from '@/lib/types'
+
+// Wording on this page. Change the text between the quotes.
+const COPY = {
+  label: 'Gallery',
+  heading: 'Every wall & canvas',
+  count: (total: number) => `${total} pieces, newest first`,
+  undated: 'Undated',
+}
+
+const [settings, works] = await Promise.all([getSettings(), getWorks()]).then(
+  ([settings, works]) => [settings, withImages(works)] as const,
+)
+
+const years = [...new Set(works.map((work) => work.year ?? ''))].sort().reverse()
+const grouped = years.map((year) => ({
+  heading: year || COPY.undated,
+  items: works.filter((work) => (work.year ?? '') === year),
+}))
+---
+
+<Base title={COPY.label}>
+  <article class="entry entry--wide">
+    <div class="entry-rail">
+      <p class="label muted">{COPY.label}</p>
+      <h1 class="entry-title">{COPY.heading}</h1>
+      {settings?.tagline && <p class="entry-sub">{settings.tagline}</p>}
+      <p class="label muted">{COPY.count(works.length)}</p>
+    </div>
+
+    <div class="entry-flow">
+      {
+        grouped.map(({ heading, items }) => (
+          <section class="gallery-year">
+            <p class="label muted">{heading}</p>
+            <ul class="gallery-grid">
+              {items.map((work) => (
+                <li>
+                  <a href={`/work/${work.slug.current}`}>
+                    <Image
+                      image={work.images![0]}
+                      alt={work.title}
+                      width={700}
+                      sizes="(max-width: 900px) 50vw, 20vw"
+                    />
+                    <span class="gallery-title">{work.title}</span>
+                    <span class="label muted">{SIDE_LABELS[work.side]}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </article>
+</Base>

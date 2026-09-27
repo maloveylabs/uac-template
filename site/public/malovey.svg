@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <!--
+    The M from the footer wordmark, on its own plate. The path is the first
+    glyph of GLYPHS in src/components/MaloveyMark.tsx, on the same 100-unit
+    body and softened by the same round-joined stroke. Redraw both together.
+
+    Colours are literals because a favicon is fetched outside the page, where
+    the CSS custom properties it mirrors do not exist.
+
+    Note for future edits: XML forbids a double hyphen inside a comment, so
+    those properties cannot be written with their dashes here.
+  -->
+  <rect width="120" height="120" fill="#1e35c8"/>
+  <path
+    transform="translate(10 10)"
+    fill="#eceae4"
+    stroke="#eceae4"
+    stroke-width="8"
+    stroke-linejoin="round"
+    d="M0 100 L0 0 L30 0 L50 40 L70 0 L100 0 L100 100 L70 100 L70 46 L50 84 L30 46 L30 100 Z"
+  />
+</svg>

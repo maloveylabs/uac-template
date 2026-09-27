@@ -1,0 +1,46 @@
+---
+import Base from '@/layouts/Base.astro'
+import Facts from '@/components/Facts.astro'
+import Image from '@/components/Image.astro'
+import PortableText from '@/components/PortableText.astro'
+import { getPages } from '@/lib/queries'
+import type { Page } from '@/lib/types'
+
+export async function getStaticPaths() {
+  // About and Say hello have their own templates, so they are skipped here.
+  const ownTemplate = ['about', 'contact']
+  const pages = await getPages()
+  return pages
+    .filter((page: Page) => !ownTemplate.includes(page.slug.current))
+    .map((page: Page) => ({ params: { slug: page.slug.current }, props: { page } }))
+}
+
+const { page } = Astro.props as { page: Page }
+---
+
+<Base title={page.title} description={page.seoDescription} image={page.image}>
+  <article class="entry">
+    <div class="entry-rail">
+      <p class="label muted">{page.title}</p>
+      <h1 class="entry-title">{page.heading ?? page.title}</h1>
+      {page.intro && <p class="entry-sub">{page.intro}</p>}
+      <Facts items={page.details ?? []} />
+    </div>
+
+    <div class="entry-flow">
+      {
+        page.image && (
+          <Image
+            class="entry-portrait"
+            image={page.image}
+            alt={page.title}
+            width={1000}
+            sizes="(max-width: 900px) 55vw, 18rem"
+            eager
+          />
+        )
+      }
+      <PortableText value={page.body} class="prose prose--lead entry-note" />
+    </div>
+  </article>
+</Base>
